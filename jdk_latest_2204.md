@@ -1,7 +1,5 @@
-# linux-fundamentals
-
-## Install JDK (Applied on 22.04)
-### Download Binary Files
+# Install JDK (Applied on 22.04)
+## Download Binary Files
 - Download from https://jdk.java.net/21/
 
 ```
