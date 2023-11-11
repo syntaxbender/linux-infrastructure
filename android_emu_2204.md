@@ -152,3 +152,9 @@ Let's run emulator
 ```
 emulator -avd virtand13
 ```
+
+If freeze your emulator you can delete your snapshot folder.
+
+```
+rm -rf ~/.android/avd/virtand13.avd/snapshots/
+```
