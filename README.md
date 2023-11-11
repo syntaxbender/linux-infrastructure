@@ -4,6 +4,7 @@ First we need to build base ubuntu 22.04 image with dockerfile
 
 ```
 docker build -t syntaxbender:22.04-ubuntu -f ./linux-infrastructure/Docker/ubuntu2204.dockerfile .
+# If you want to rebuild add --no-cache parameter
 ```
 
 Let's check if the image build is successful.
