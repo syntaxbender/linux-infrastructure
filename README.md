@@ -53,3 +53,59 @@ We can take a shell after starting container with this command
 ```
 docker exec -it ubuntu-22.04 bash
 ```
+
+## Creating Volumes
+
+Volumes are usefull for persistance of config and log files.
+
+We can see volumes by this way.
+
+```
+$ docker volume ls
+
+DRIVER    VOLUME NAME
+local     c984...e4fc
+local     f670...49f0
+```
+
+### 1- Create volume in Dockerfile
+
+We want to create persistant 2 directories in container we need to add this line to dockerfile.
+
+```
+FROM openjdk:8u131-jdk-alpine
+VOLUME /var/log 
+VOLUME /my/data 
+```
+
+We cant specify the directory associated with the host machine. It works only for container.
+Files stores in host machine in this directory
+
+```
+/var/lib/docker/volumes/XXXXXXX/_data
+```
+
+### 2- Create volume in commandline
+
+We can specify the volume with the "-v" parameter when running a container. 
+
+```
+docker run --rm -it -v $(pwd):/usr/share/nginx/html my-openjdk
+```
+
+### 3- Create volume with docker compose file
+
+Similar to commandline volumes we can create and share directories with host machine
+
+```
+services:
+  my_service:
+    image: my_image
+    volumes:
+      - my_volume:/path/in/container
+      - /host/path:/another/path/in/container
+volumes:
+  my_volume:
+```
+
+
