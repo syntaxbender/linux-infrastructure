@@ -68,7 +68,7 @@ local     c984...e4fc
 local     f670...49f0
 ```
 
-### 1- Create volume in Dockerfile
+### 1 - Create volume in Dockerfile
 
 We want to create persistant 2 directories in container we need to add this line to dockerfile.
 
@@ -85,7 +85,7 @@ Files stores in host machine in this directory
 /var/lib/docker/volumes/XXXXXXX/_data
 ```
 
-### 2- Create volume in commandline
+### 2 - Create volume in commandline
 
 We can specify the volume with the "-v" parameter when running a container. 
 
@@ -93,7 +93,7 @@ We can specify the volume with the "-v" parameter when running a container.
 docker run --rm -it -v $(pwd):/usr/share/nginx/html my-openjdk
 ```
 
-### 3- Create volume with docker compose file
+### 3 - Create volume with docker compose file
 
 Similar to commandline volumes we can create and share directories with host machine
 
