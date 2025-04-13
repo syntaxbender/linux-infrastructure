@@ -1,1 +1,21 @@
-default
+server {
+        listen 80 default_server;
+        root /var/www/html;
+        index index.html index.htm index.nginx-debian.html;
+
+        server_name 18.198.24.38;
+
+        location / {
+                try_files $uri $uri/ =404;
+        }
+
+        location ~ /\.ht {
+               deny all;
+        }
+}
+
+server {
+    listen 80 default_server;
+    server_name _;
+    return 301 https://$host$request_uri;
+}
