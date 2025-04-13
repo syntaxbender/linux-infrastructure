@@ -1,6 +1,9 @@
-node nginx install
+# Create Node Stack
+- node20
+- nginx
+- certbot
 
- # Install prerequites, Node20, Nginx, certbot
+# Install prerequites, Node20, Nginx, certbot
 
 ```bash
 #!/bin/bash
