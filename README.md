@@ -13,7 +13,12 @@ sudo apt-get install -y nodejs
 # Create user, d
 
 ```bash
-USERNAME=faruk
-useradd -m -d /home/$USERNAME -s /bin/bash -U $USERNAME && mkdir -p /home/$USERNAME/public_html && chmod -R 750 /home/$USERNAME && chown -R $USERNAME:$USERNAME /home/$USERNAME
-
+USERNAME=faruk && \
+sudo useradd -m -d /home/$USERNAME -s /bin/bash -U $USERNAME && \
+sudo mkdir -p /home/$USERNAME/public_html && \
+sudo chmod -R 750 /home/$USERNAME && \
+sudo chown -R $USERNAME:$USERNAME /home/$USERNAME && \
+sudo usermod -aG $USERNAME www-data
 ```
+
+
