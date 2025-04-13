@@ -10,7 +10,7 @@ curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
 
-# Create user, d
+# Create user, directories, permissions
 
 ```bash
 USERNAME=faruk && \
@@ -20,5 +20,4 @@ sudo chmod -R 750 /home/$USERNAME && \
 sudo chown -R $USERNAME:$USERNAME /home/$USERNAME && \
 sudo usermod -aG $USERNAME www-data
 ```
-
 
