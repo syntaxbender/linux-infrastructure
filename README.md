@@ -28,10 +28,12 @@ sudo usermod -aG $USERNAME www-data
 SERVER_IP=192.168.1.100
 
 cd /var/www/html
-sudo wget -O /var/www/html/nothing.jpg https://raw.githubusercontent.com/syntaxbender/linux-infrastructure/refs/heads/main/data/nginx/var_html/nothing.jpg
-sudo wget -O /var/www/html/index.html https://raw.githubusercontent.com/syntaxbender/linux-infrastructure/refs/heads/main/data/nginx/var_html/index.html
-sudo rm /etc/nginx/sites-enabled/default
-sudo mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.bak
+[ -f "/var/www/html/nothing.jpg" ] && sudo mv /var/www/html/nothing.jpg /var/www/html/nothing-$(uuidgen).jpg.bak
+[ -f "/var/www/html/index.html" ] && sudo mv /var/www/html/index.html /var/www/html/index-$(uuidgen).html.bak
+sudo wget -q -O /var/www/html/nothing.jpg https://raw.githubusercontent.com/syntaxbender/linux-infrastructure/refs/heads/main/data/nginx/var_html/nothing.jpg
+sudo wget -q -O /var/www/html/index.html https://raw.githubusercontent.com/syntaxbender/linux-infrastructure/refs/heads/main/data/nginx/var_html/index.html
+[ -f "/etc/nginx/sites-enabled/default" ] && sudo rm /etc/nginx/sites-enabled/default || echo "Default is not enabled in nginx"
+[ -f "/etc/nginx/sites-available/default" ] && sudo mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default-$(uuidgen).bak || echo "Default is not available in nginx"
 
 cat <<EOF > /etc/nginx/sites-available/default
 server {
@@ -57,7 +59,9 @@ server {
 }
 EOF
 
-
+sudo ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+echo "Testing nginx..."
+sudo nginx -t && { sudo systemctl restart nginx && echo "Nginx restarted successfully!"; } || echo "Nginx configuration failed!"
 ```
 
 
