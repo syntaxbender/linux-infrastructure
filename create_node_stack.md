@@ -100,7 +100,7 @@ sudo nginx -t && \
 
 ```bash
 DOMAINS=example.com,www.example.com
-PRIMARY_DOMAIN=$(echo "$SERVER_NAME" | cut -d',' -f1)
+PRIMARY_DOMAIN=$(echo "$DOMAINS" | cut -d',' -f1)
 
 certbot certonly -a nginx --agree-tos --no-eff-email --staple-ocsp --force-renewal --email info@$PRIMARY_DOMAIN -d $DOMAINS
 ```
