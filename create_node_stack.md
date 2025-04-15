@@ -8,11 +8,15 @@
 ```bash
 #!/bin/bash
 
-sudo apt update
-sudo apt upgrade
-sudo apt install -y curl wget net-tools dnsutils build-essential git gnupg lsb-release ca-certificates software-properties-common openssl nginx certbot python3-certbot-nginx
-sudo curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt install -y nodejs
+if [[ "$EUID" -ne 0 ]]; then
+  echo "Please run as root! exiting..."
+  exit 1
+fi
+
+apt update && apt upgrade -y
+apt install -y curl wget net-tools dnsutils build-essential git gnupg lsb-release ca-certificates software-properties-common openssl nginx certbot python3-certbot-nginx uuid-runtime
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt install -y nodejs
 ```
 
 # Create user, directories, permissions
@@ -20,13 +24,18 @@ sudo apt install -y nodejs
 ```bash
 #!/bin/bash
 
+if [[ "$EUID" -ne 0 ]]; then
+  echo "Please run as root! exiting..."
+  exit 1
+fi
+
 USERNAME=faruk && \
 
-sudo useradd -m -d /home/$USERNAME -s /bin/bash -U $USERNAME && \
-sudo mkdir -p /home/$USERNAME/public_html && \
-sudo chmod -R 750 /home/$USERNAME && \
-sudo chown -R $USERNAME:$USERNAME /home/$USERNAME && \
-sudo usermod -aG $USERNAME www-data
+useradd -m -d /home/$USERNAME -s /bin/bash -U $USERNAME && \
+mkdir -p /home/$USERNAME/public_html && \
+chmod -R 750 /home/$USERNAME && \
+chown -R $USERNAME:$USERNAME /home/$USERNAME && \
+usermod -aG $USERNAME www-data
 ```
 
 # default index, https_redirect
@@ -34,24 +43,29 @@ sudo usermod -aG $USERNAME www-data
 ```bash
 #!/bin/bash
 
+if [[ "$EUID" -ne 0 ]]; then
+  echo "Please run as root! exiting..."
+  exit 1
+fi
+
 SERVER_IP=192.168.1.100
 
 [ -f "/var/www/html/nothing.jpg" ] && \
-  sudo mv /var/www/html/nothing.jpg /var/www/html/nothing-$(uuidgen).jpg.bak
+  mv /var/www/html/nothing.jpg /var/www/html/nothing-$(uuidgen).jpg.bak
 [ -f "/var/www/html/index.html" ] && \
-  sudo mv /var/www/html/index.html /var/www/html/index-$(uuidgen).html.bak
+  mv /var/www/html/index.html /var/www/html/index-$(uuidgen).html.bak
 
-sudo wget -q -O /var/www/html/nothing.jpg https://raw.githubusercontent.com/syntaxbender/linux-infrastructure/refs/heads/main/data/nginx/var_html/nothing.jpg
-sudo wget -q -O /var/www/html/index.html https://raw.githubusercontent.com/syntaxbender/linux-infrastructure/refs/heads/main/data/nginx/var_html/index.html
+wget -q -O /var/www/html/nothing.jpg https://raw.githubusercontent.com/syntaxbender/linux-infrastructure/refs/heads/main/data/nginx/var_html/nothing.jpg
+wget -q -O /var/www/html/index.html https://raw.githubusercontent.com/syntaxbender/linux-infrastructure/refs/heads/main/data/nginx/var_html/index.html
 
 mkdir -p /etc/nginx/ssl/ && \
-  sudo openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /etc/nginx/ssl/nginx.key -out /etc/nginx/ssl/nginx.crt
+  openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /etc/nginx/ssl/nginx.key -out /etc/nginx/ssl/nginx.crt
 
 [ -f "/etc/nginx/sites-enabled/default" ] && \
-  sudo rm /etc/nginx/sites-enabled/default || \
+  rm /etc/nginx/sites-enabled/default || \
   echo "Default is not enabled in nginx"
 [ -f "/etc/nginx/sites-available/default" ] && \
-  sudo mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default-$(uuidgen).bak || \
+  mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default-$(uuidgen).bak || \
   echo "Default is not available in nginx"
 
 cat <<EOF > /etc/nginx/sites-available/default
@@ -86,11 +100,11 @@ server{
 }
 EOF
 
-sudo ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
 echo "Testing nginx..."
-sudo nginx -t && \
+nginx -t && \
   {
-    sudo systemctl restart nginx && \
+    systemctl restart nginx && \
       echo "Nginx restarted successfully!";
   } || \
   echo "Nginx configuration failed!"
@@ -99,6 +113,11 @@ sudo nginx -t && \
 # certbot renewal
 
 ```bash
+if [[ "$EUID" -ne 0 ]]; then
+  echo "Please run as root! exiting..."
+  exit 1
+fi
+
 DOMAINS=example.com,www.example.com
 PRIMARY_DOMAIN=$(echo "$DOMAINS" | cut -d',' -f1)
 
@@ -109,6 +128,11 @@ certbot certonly -a nginx --agree-tos --no-eff-email --staple-ocsp --force-renew
 
 ```bash
 #!/bin/bash
+
+if [[ "$EUID" -ne 0 ]]; then
+  echo "Please run as root! exiting..."
+  exit 1
+fi
 
 PROXY_PASS=""
 DOMAIN=""
@@ -160,7 +184,7 @@ fi
 [ -f "/etc/nginx/sites-available/$DOMAIN.conf" ] && \
   {
     mkdir -p /etc/nginx/sites-available/deadsites
-    sudo mv /etc/nginx/sites-available/$DOMAIN.conf /etc/nginx/sites-available/deadsites/$DOMAIN-$(uuidgen).conf.bak
+    mv /etc/nginx/sites-available/$DOMAIN.conf /etc/nginx/sites-available/deadsites/$DOMAIN-$(uuidgen).conf.bak
   }
 
 cat > "/etc/nginx/sites-available/$DOMAIN.conf" <<EOF
@@ -201,12 +225,12 @@ server {
 EOF
 fi
 
-sudo ln -s /etc/nginx/sites-available/$DOMAIN.conf /etc/nginx/sites-enabled/
+ln -s /etc/nginx/sites-available/$DOMAIN.conf /etc/nginx/sites-enabled/
 
 echo "Testing nginx..."
-sudo nginx -t && \
+nginx -t && \
   {
-    sudo systemctl restart nginx && \
+    systemctl restart nginx && \
       echo "Nginx restarted successfully!";
   } || \
   echo "Nginx configuration failed!"
