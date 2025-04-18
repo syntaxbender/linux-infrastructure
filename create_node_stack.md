@@ -241,7 +241,7 @@ nginx -t && \
 
 # create node(next) service
 
-```
+``` bash
 #!/bin/bash
 
 if [[ "$EUID" -ne 0 ]]; then
